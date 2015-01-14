@@ -8,15 +8,15 @@ public class SingletonExample {
     public static void main(String[] args) {
 
 	ExecutorService executorService = Executors.newFixedThreadPool(10000);
-	final Singleton2 sin2 = Singleton2.INSTANCE;
+	final SingletonEnum sin2 = SingletonEnum.INSTANCE;
 
 	for (int i = 0; i < 10000; i++) {
 	    executorService.execute(new Runnable() {
 		@Override
 		public void run() {
 
-		    Singleton.getInstance();
-		    if (Singleton2.getInstance() != sin2) {
+		    SingletonDoubleLock.getInstance();
+		    if (SingletonEnum.getInstance() != sin2) {
 			System.out.println("2 fake!");
 		    }
 		}
@@ -26,19 +26,42 @@ public class SingletonExample {
     }
 }
 
-class Singleton {
+/*
+ * Lazy, synchronized
+ */
 
-    private static Singleton instance;
+class SingletonSync {
 
-    private Singleton() {
+    private static SingletonSync instance = null;
+
+    private SingletonSync() {
+    }
+
+    public static synchronized SingletonSync getInstance() {
+	if (instance == null) {
+	    instance = new SingletonSync();
+	}
+
+	return instance;
+    }
+}
+
+/*
+ * Lazy, double checked locking, volatile is required
+ */
+class SingletonDoubleLock {
+
+    private static volatile SingletonDoubleLock instance;
+
+    private SingletonDoubleLock() {
 
     }
 
-    public static Singleton getInstance() {
+    public static SingletonDoubleLock getInstance() {
 	if (instance == null) {
-	    synchronized (Singleton.class) {
+	    synchronized (SingletonDoubleLock.class) {
 		if (instance == null) {
-		    instance = new Singleton();
+		    instance = new SingletonDoubleLock();
 		    System.out.println("new instance!");
 		}
 	    }
@@ -47,24 +70,68 @@ class Singleton {
     }
 }
 
-enum Singleton2 {
-    INSTANCE;
-    public static Singleton2 getInstance() {
+/*
+ * Eager initialization
+ */
+
+class SingletonStaticInstance {
+    private static final SingletonStaticInstance INSTANCE = new SingletonStaticInstance();
+
+    private SingletonStaticInstance() {
+    }
+
+    public static SingletonStaticInstance getInstance() {
 	return INSTANCE;
     }
 }
 
-class Singleton3 {
-    private static Singleton3 INSTANCE;
+/*
+ * Eager initialization, in static block
+ */
+class SingletonStaticBlock {
+    private static SingletonStaticBlock INSTANCE;
     static {
-	INSTANCE = new Singleton3();
+	/*
+	 * do some other logics like exception handling, etc...
+	 */
+	try {
+	    INSTANCE = new SingletonStaticBlock();
+        } catch (Exception e) {
+            throw new RuntimeException("Darn, an error occurred!", e);
+        }
     }
 
-    private Singleton3() {
+    private SingletonStaticBlock() {
+    }
+
+    public static SingletonStaticBlock getInstance() {
+	return INSTANCE;
+    }
+}
+
+/*
+ * Lazy initialization on demand holder
+ */
+class SingletonOnDemandHolder {
+    static class Holder {
+	private static final SingletonOnDemandHolder INSTANCE = new SingletonOnDemandHolder();
+    }
+
+    private SingletonOnDemandHolder() {
 
     }
 
-    public static Singleton3 getInstance() {
+    public static SingletonOnDemandHolder getInstance() {
+	return Holder.INSTANCE;
+    }
+}
+
+/*
+ * Enum way
+ */
+enum SingletonEnum {
+    INSTANCE;
+    public static SingletonEnum getInstance() {
 	return INSTANCE;
     }
 }
