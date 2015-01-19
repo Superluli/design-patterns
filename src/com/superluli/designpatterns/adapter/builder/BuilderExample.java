@@ -2,54 +2,103 @@ package com.superluli.designpatterns.adapter.builder;
 
 public class BuilderExample {
 
-    static class CarBuilder {
+    public static void main(String[] args) {
+	/*
+	 * Lagacy builder style
+	 */
+	System.out.println(CarBuilder.startBuiding().addBody("CF").addEngine("V6").addTire("PSS")
+		.finishBuiding());
+	/*
+	 * Jax-rs Response style
+	 */
+	System.out.println(Car2.startBuiding().addBody("CF").addEngine("V6").addTire("PSS")
+		.finishBuiding());
+    }
+}
 
-	Car car;
+class CarBuilder {
 
-	CarBuilder() {
-	    car = new Car();
+    Car car;
+
+    private CarBuilder() {
+	car = new Car();
+    }
+
+    static CarBuilder startBuiding() {
+	return new CarBuilder();
+    }
+
+    CarBuilder addBody(String body) {
+	car.body = body;
+	return this;
+    }
+
+    CarBuilder addTire(String tire) {
+	car.tire = tire;
+	return this;
+    }
+
+    CarBuilder addEngine(String engine) {
+	car.engine = engine;
+	return this;
+    }
+
+    Car finishBuiding() {
+	return car;
+    }
+
+    static class Car {
+
+	@Override
+	public String toString() {
+	    return "Car [body=" + body + ", tire=" + tire + ", engine=" + engine + "]";
+	}
+	String body;
+	String tire;
+	String engine;
+    }
+}
+
+class Car2 {
+
+    @Override
+    public String toString() {
+	return "Car2 [body=" + body + ", tire=" + tire + ", engine=" + engine + "]";
+    }
+
+    String body;
+    String tire;
+    String engine;
+
+    static CarBuilder2 startBuiding() {
+	return new CarBuilder2();
+    }
+
+    static class CarBuilder2 {
+
+	Car2 car;
+
+	private CarBuilder2() {
+	    car = new Car2();
 	}
 
-	CarBuilder addBody(String body) {
+	CarBuilder2 addBody(String body) {
 	    car.body = body;
 	    return this;
 	}
 
-	CarBuilder addTire(String tire) {
+	CarBuilder2 addTire(String tire) {
 	    car.tire = tire;
 	    return this;
 	}
 
-	CarBuilder addEngine(String engine) {
+	CarBuilder2 addEngine(String engine) {
 	    car.engine = engine;
 	    return this;
 	}
 
-	CarBuilder addSuspension(String suspension) {
-	    car.suspension = suspension;
-	    return this;
-	}
-
-	Car build() {
+	public Car2 finishBuiding() {
 	    return car;
 	}
-
-	static class Car {
-	    @Override
-	    public String toString() {
-		return "Car [body=" + body + ", tire=" + tire + ", engine=" + engine
-			+ ", suspension=" + suspension + "]";
-	    }
-
-	    String body;
-	    String tire;
-	    String engine;
-	    String suspension;
-	}
-    }
-
-    public static void main(String[] args) {
-	System.out.println(new CarBuilder().addBody("CF").addEngine("V6").addTire("PSS")
-		.addSuspension("Multilink").build());
     }
 }
