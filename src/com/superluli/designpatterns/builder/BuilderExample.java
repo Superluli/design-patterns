@@ -1,4 +1,4 @@
-package com.superluli.designpatterns.adapter.builder;
+package com.superluli.designpatterns.builder;
 
 public class BuilderExample {
 
